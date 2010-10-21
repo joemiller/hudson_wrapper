@@ -1,0 +1,11 @@
+Simple script for wrapping external Hudson jobs and sending their output to Hudson.
+
+Best used for cron jobs.
+
+This script originated here:  http://blog.markfeeney.com/2010/01/hudson-external-jobs-wrapper-script.html
+
+I added a few simple features:
+
+  1) If a job doesn't exist in Hudson, it will automatically be created.
+     
+  2) Job names with whitespace are now supported (eg: "My Job #1")
