@@ -21,6 +21,9 @@
 # Recent changes - joeym@joeym.net:
 #  1) If a job doesn't exist in Hudson, it will automatically be created
 #  2) Job names with whitespace are now supported (eg: "My Job #1")
+#
+# The latest version of this script can always be found at:
+#   http://github.com/joemiller/hudson_wrapper
 # 
 if [ $# -lt 3 ]; then
     echo "Not enough args!"
