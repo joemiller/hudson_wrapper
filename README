@@ -9,3 +9,16 @@ I added a few simple features:
   1) If a job doesn't exist in Hudson, it will automatically be created.
      
   2) Job names with whitespace are now supported (eg: "My Job #1")
+
+  3) Supports authenticating to Hudson instances that require it
+     - Set CURL_AUTH_OPTS environment variable, or hardcode into the script (see example in the script)
+     - Be aware that this isn't the securest method, since your password could be read by someone on
+       the same machine by examining the environment or looking at the script itself.
+
+Examples:
+   $ hudson_wrapper http://hudson.myco.com:8080 testjob /path/to/script.sh
+   $ hudson_wrapper http://hudson.myco.com:8080 testjob 'sleep 2 && ls -la'
+
+example with authentication:
+   $ CURL_AUTH_OPTS="--user myuser:pass" hudson_wrapper http://hudson.myco.com:8080 testjob /path/to/script.sh
+

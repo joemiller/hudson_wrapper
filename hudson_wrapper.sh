@@ -8,6 +8,9 @@
 #   e.g. hudson_wrapper http://hudson.myco.com:8080 testjob /path/to/script.sh
 #        hudson_wrapper http://hudson.myco.com:8080 testjob 'sleep 2 && ls -la'
 #
+#   example with authentication:
+#        CURL_AUTH_OPTS="--user myuser:pass" hudson_wrapper http://hudson.myco.com:8080 testjob /path/to/script.sh
+#
 # Requires:
 #   - curl
 #   - bc
@@ -30,8 +33,9 @@ JOB_NAME=$1; shift
 SCRIPT="$@"
 
 # this option gets passed directly to curl.  Use it to specify credentials if your hudson
-# requires it.  Otherwise, leave it blank (CURL_AUTH_OPTS="")
-CURL_AUTH_OPTS="--user automated_scripts:password"
+# requires it.  Otherwise, leave it blank (CURL_AUTH_OPTS="").  You can also override this
+# by setting it in your environment before calling this script
+CURL_AUTH_OPTS=${CURL_AUTH_OPTS:="--user automated_script_user:password"}
 
 ## encode any whitespace in the job name for URLs
 JOB_NAME=$(echo "$JOB_NAME" | sed -e 's@\s@%20@g')
