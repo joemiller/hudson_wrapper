@@ -29,6 +29,10 @@ HUDSON_URL=$1; shift
 JOB_NAME=$1; shift
 SCRIPT="$@"
 
+# this option gets passed directly to curl.  Use it to specify credentials if your hudson
+# requires it.  Otherwise, leave it blank (CURL_AUTH_OPTS="")
+CURL_AUTH_OPTS="--user automated_scripts:password"
+
 ## encode any whitespace in the job name for URLs
 JOB_NAME=$(echo "$JOB_NAME" | sed -e 's@\s@%20@g')
 
@@ -57,7 +61,7 @@ CURLTEMP=$(mktemp -t hudson_wrapper_curl.XXXXXXXX)
 echo "<run><log encoding=\"hexBinary\">$(hexdump -v -e '1/1 "%02x"' $OUTFILE)</log><result>${RESULT}</result><duration>${ELAPSED_MS}</duration></run>" > $CURLTEMP
 
 ### create job if it does not exist
-http_code=$(curl -s -o /dev/null -w'%{http_code}' -X POST ${HUDSON_URL}/job/${JOB_NAME})
+http_code=$(curl -s -o /dev/null -w'%{http_code}' -X POST ${CURL_AUTH_OPTS} ${HUDSON_URL}/job/${JOB_NAME})
 
 if [ "${http_code}" = "404" ]; then
         # create a new external job named '$JOB_NAME' on the hudson server
@@ -74,18 +78,18 @@ if [ "${http_code}" = "404" ]; then
   <properties/>
 </hudson.model.ExternalJob>
 EOF
-        curl -s -X POST -d @${temp_create} -H "Content-Type: text/xml" "${HUDSON_URL}/createItem?name=${JOB_NAME}"
+        curl -s -X POST -d @${temp_create} ${CURL_AUTH_OPTS} -H "Content-Type: text/xml" "${HUDSON_URL}/createItem?name=${JOB_NAME}"
 
 	## sleep then try to hit the job.  I noticed this was necessary otherwise
 	## the /postBuildResult step would fail
         sleep 1
-        curl -s -o /dev/null "${HUDSON_URL}/job/${JOB_NAME}/"
+        curl -s -o /dev/null ${CURL_AUTH_OPTS} "${HUDSON_URL}/job/${JOB_NAME}/"
         rm $temp_create
         sleep 1
 fi
 
 ### post results to hudson
-curl -s -X POST -d @${CURLTEMP} "${HUDSON_URL}/job/${JOB_NAME}/postBuildResult"
+curl -s -X POST -d @${CURLTEMP} ${CURL_AUTH_OPTS} "${HUDSON_URL}/job/${JOB_NAME}/postBuildResult"
 
 ### Clean up our temp files and we're done.
 
