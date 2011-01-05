@@ -40,13 +40,16 @@ SCRIPT="$@"
 # by setting it in your environment before calling this script
 CURL_AUTH_OPTS=${CURL_AUTH_OPTS:="--user automated_script_user:password"}
 
+HOSTNAME=$(hostname)
+
 ## encode any whitespace in the job name for URLs
 JOB_NAME=$(echo "$JOB_NAME" | sed -e 's@\s@%20@g')
 
 OUTFILE=$(mktemp -t hudson_wrapper.XXXXXXXX)
-echo "Temp file is:     $OUTFILE" >> $OUTFILE
-echo "Hudson job name:  $JOB_NAME" >> $OUTFILE
-echo "Script being run: $SCRIPT" >> $OUTFILE
+echo "Temp file is    : $OUTFILE"   >> $OUTFILE
+echo "Hudson job name : $JOB_NAME"  >> $OUTFILE
+echo "Script being run: $SCRIPT"    >> $OUTFILE
+echo "Host            : $HOSTNAME"  >> $OUTFILE
 echo "" >> $OUTFILE
 
 ### Execute the given script, capturing the result and how long it takes.
@@ -56,9 +59,10 @@ eval $SCRIPT >> $OUTFILE 2>&1
 RESULT=$?
 END_TIME=$(date +%s.%N)
 ELAPSED_MS=$(echo "($END_TIME - $START_TIME) * 1000 / 1" | bc)
-echo "Start time: $START_TIME" >> $OUTFILE
-echo "End time:   $END_TIME" >> $OUTFILE
-echo "Elapsed ms: $ELAPSED_MS" >> $OUTFILE
+echo "" >> $OUTFILE
+echo "Start time: $START_TIME"  >> $OUTFILE
+echo "End time  : $END_TIME"    >> $OUTFILE
+echo "Elapsed ms: $ELAPSED_MS"  >> $OUTFILE
 
 ### Post the results of the command to Hudson.
 
@@ -73,7 +77,6 @@ http_code=$(curl -s -o /dev/null -w'%{http_code}' -X POST ${CURL_AUTH_OPTS} ${HU
 if [ "${http_code}" = "404" ]; then
         # create a new external job named '$JOB_NAME' on the hudson server
 
-        host=$(hostname)
         temp_create=$(mktemp -t hudson_wrapper_curl-createjob.XXXXXXXX)
 
         cat >${temp_create} <<-EOF
