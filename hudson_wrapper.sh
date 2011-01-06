@@ -83,7 +83,7 @@ if [ "${http_code}" = "404" ]; then
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson.model.ExternalJob>
   <actions/>
-  <description>command: '$SCRIPT' , running from host: $host </description>
+  <description>command: '$SCRIPT' , running from host: $HOSTNAME </description>
   <keepDependencies>false</keepDependencies>
   <properties/>
 </hudson.model.ExternalJob>
