@@ -1,4 +1,3 @@
-
 #!/bin/sh
 # Wrapper for sending the results of an arbitrary script to Hudson for
 # monitoring. 
@@ -44,7 +43,7 @@ CURL_AUTH_OPTS=${CURL_AUTH_OPTS:="--user automated_script_user:password"}
 HOSTNAME=`hostname`
 
 ## encode any whitespace in the job name for URLs
-JOB_NAME=`echo "$JOB_NAME" | sed -e 's@\s@%20@g'`
+
 
 OUTFILE=`mktemp -t hudson_wrapper.XXXXXX`
 echo "Temp file is    : $OUTFILE"   >> $OUTFILE
